@@ -81,3 +81,10 @@ Checklists are stored as JSON files in the `checklists/` directory. The format i
   }
 }
 ```
+
+## TODO
+
+make the the checklists more customizable; instead of things with pipes arent items, can do if you write : null, its not an item, and you should write : true for things you want
+- somehow be able to get parents also as items?
+more fun animations!
+editing checklists?

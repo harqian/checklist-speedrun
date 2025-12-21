@@ -1,6 +1,5 @@
 {
   "night": {
-    "start timer!": null,
     "wind down (9:15)": {
       "shower": null,
       "moisturization": null,
@@ -16,8 +15,6 @@
       },
       "anything else notable": null
     },
-    "meditate 5m (9:30)": null,
-    "sleep": null,
-    "end timer, log time": null
+    "meditate 5m (9:30)": null
   }
 }

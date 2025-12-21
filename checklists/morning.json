@@ -1,24 +1,21 @@
 {
   "morning": {
-    "start timer!": null,
-    "get ready": {
-      "get": {
-        "earbuds": null,
-        "glasses": null,
-        "keys": null,
-        "watch": null,
-        "cleats?": null,
-        "phone": null,
-        "water bottle": null
-      },
-      "do": {
-        "deodorant": null,
-        "moisturization": null,
-        "nose solution": null,
-        "powder": null,
-        "brush": null,
-        "eat gummies": null
-      }
+    "get": {
+      "earbuds": null,
+      "glasses": null,
+      "keys": null,
+      "watch": null,
+      "cleats?": null,
+      "phone": null,
+      "water bottle": null
+    },
+    "do": {
+      "deodorant": null,
+      "moisturization": null,
+      "nose solution": null,
+      "powder": null,
+      "brush": null,
+      "eat gummies": null
     },
     "——————————— (headphones, dnd) ——————————": null,
     "alarms": {
@@ -31,8 +28,7 @@
     "2 & 5: most important idea/experience from each?": null,
     "appreciate: one thing in my life thats very good": {
       "|happy :)|": null
-    },
-    "end timer, log time": null
+    }
   }
 }
 
