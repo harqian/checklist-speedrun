@@ -1,11 +1,14 @@
 {
   "night": {
+    "shower (no skipping!)": null,
     "wind down (9:15)": {
-      "shower": null,
+      "charge earbuds, phone, computer": null,
       "moisturization": null,
       "nose solution": null,
       "brush, floss": null,
       "log: phys res? echo? sleep data?": null,
+      "do !habits": null,
+      "put on WHOOP": null,
       "earplugs, turn off all lights, get red light": null
     },
     "reflect (9:25)": {

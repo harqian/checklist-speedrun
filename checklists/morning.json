@@ -1,5 +1,14 @@
 {
   "morning": {
+    "shower": null,
+    "do": {
+      "moisturization": null,
+      "powder": null,
+      "eat gummies": null,
+      "deodorant": null,
+      "nose solution": null,
+      "brush": null
+    },
     "get": {
       "earbuds": null,
       "glasses": null,
@@ -9,14 +18,6 @@
       "phone": null,
       "water bottle": null
     },
-    "do": {
-      "deodorant": null,
-      "moisturization": null,
-      "nose solution": null,
-      "powder": null,
-      "brush": null,
-      "eat gummies": null
-    },
     "——————————— (headphones, dnd) ——————————": null,
     "alarms": {
       "look at calendar, set alarms for important things": null,
@@ -25,6 +26,8 @@
     "deal with [reminders & alexa notes]: do the thing || postpone (snap snap!)": {
       "|actually kind of fun to do these|": null
     },
+    "look at nomo": null,
+    "look at echo": null,
     "2 & 5: most important idea/experience from each?": null,
     "appreciate: one thing in my life thats very good": {
       "|happy :)|": null
