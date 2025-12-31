@@ -9,7 +9,7 @@ import glob
 import dotenv
 
 app = Flask(__name__)
-app.config['JSON_SORT_KEYS'] = False
+app.json.sort_keys = False
 
 # Configuration
 dotenv.load_dotenv()
@@ -76,6 +76,9 @@ def get_checklist(checklist_name):
     """Get a specific checklist by name"""
     try:
         file_path = os.path.join(CHECKLISTS_DIR, f'{checklist_name}.json')
+        # Prevent path traversal attacks
+        if not os.path.realpath(file_path).startswith(os.path.realpath(CHECKLISTS_DIR)):
+            return jsonify({'error': 'Invalid checklist name'}), 400
         if not os.path.exists(file_path):
             return jsonify({'error': 'Checklist not found'}), 404
 

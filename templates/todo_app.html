@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checklist Speedrun</title>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
     <style>
         :root {
             --bg-color: #ffffff;
@@ -699,8 +700,8 @@
 
                 const textDiv = document.createElement('div');
                 textDiv.className = 'todo-text';
-                // Parse markdown and strip outer <p> tags if present
-                let markdownHtml = marked.parse(key);
+                // Parse markdown, sanitize, and strip outer <p> tags
+                let markdownHtml = DOMPurify.sanitize(marked.parse(key));
                 if (markdownHtml.trim().startsWith('<p>') && markdownHtml.trim().endsWith('</p>')) {
                     markdownHtml = markdownHtml.trim().slice(3, -4);
                 }
