@@ -86,23 +86,3 @@ Checklists are stored as JSON files in the `checklists/` directory. The format i
     }
 }
 ```
-
-## TODO
-
-### bugs
-
-when clicking, goes into a mode where spacebar no longer works (also the skipping from clicking is a bit wrong, skips items with bar children)
-
-### features / tweaks
-
-make state save for reloads (shift x to reset)
-make space & down arrow go to the next available item, not just the next one
-keyboard shortcut hints? (maybe tell ppl shift x when they reload)
-make the the checklists more customizable; instead of things with pipes arent items, can do if you write : null, its not an item, and you should write : true for things you want
-
--   somehow be able to get parents also as items?
-    more fun animations!
--   animations + sounds for all of the keyboard shortcuts
--   something better for when i finish
--   speed effect
-    editing checklists?
