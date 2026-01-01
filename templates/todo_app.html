@@ -911,6 +911,9 @@
                 undoStack = [];
                 redoStack = [];
 
+                // Clear any saved state for this checklist (fresh start on switch)
+                clearSavedState();
+
                 const response = await fetch(`/api/checklist/${name}`);
                 const data = await response.json();
 
@@ -923,18 +926,8 @@
                     checklistData = rawData;
                 }
 
-                // Try to load saved state
-                const hasState = loadState();
-
                 renderChecklist();
-
-                // If no saved state, start fresh timer
-                if (!hasState) {
-                    startTimer();
-                } else {
-                    // Resume from saved time
-                    document.getElementById('timer').textContent = formatTime(timerPausedTime);
-                }
+                startTimer();
             } catch (e) {
                 console.error('Failed to load checklist:', e);
                 showStatus('Failed to load checklist', 'error');
@@ -1003,14 +996,22 @@
             if (isPipeWrapped(itemId)) return false; // Legacy pipe header
 
             const hasChildren = value !== null && typeof value === 'object' && Object.keys(value).length > 0;
-            const isCheckableParent = hasChildren && value._checkable === true;
 
             if (hasChildren) {
-                return isCheckableParent;
+                // Check if explicitly marked as checkable
+                if (value._checkable === true) return true;
+
+                // Check if ALL children are non-actionable (null or false)
+                // If so, this parent should be actionable itself
+                const childKeys = Object.keys(value).filter(k => k !== '_checkable');
+                const allChildrenNonActionable = childKeys.every(key => {
+                    const childValue = value[key];
+                    return childValue === null || childValue === false;
+                });
+                return allChildrenNonActionable;
             }
 
-            // Leaf node: true is interactable. Legacy: null was interactable but we migrated.
-            // We'll treat 'true' and any other non-null, non-object value as interactable for now.
+            // Leaf node: true is interactable
             return value === true || (value !== null && typeof value !== 'object');
         }
 
@@ -1034,6 +1035,12 @@
             // Parent node - check if it was manually completed first
             if (completedItems.has(itemId)) {
                 return true;
+            }
+
+            // If this item is actionable (can be checked), it's only done if in completedItems
+            // This handles items with all null children - they're actionable but need explicit completion
+            if (isActionable(itemId)) {
+                return false;
             }
 
             // Otherwise, check if all non-header children are completed
@@ -1427,10 +1434,10 @@
             const allItems = buildOrderedItemList();
             const currentIndex = allItems.indexOf(currentItemId);
 
-            // Find next actionable incomplete item
+            // Find next actionable item (regardless of completion status)
             for (let i = currentIndex + 1; i < allItems.length; i++) {
                 const id = allItems[i];
-                if (isActionable(id) && !isItemCompletedById(id)) {
+                if (isActionable(id)) {
                     setCurrentItem(id);
                     return;
                 }
@@ -1438,7 +1445,7 @@
             // Wrap around
             for (let i = 0; i <= currentIndex; i++) {
                 const id = allItems[i];
-                if (isActionable(id) && !isItemCompletedById(id)) {
+                if (isActionable(id)) {
                     setCurrentItem(id);
                     return;
                 }
@@ -1449,10 +1456,10 @@
             const allItems = buildOrderedItemList();
             const currentIndex = allItems.indexOf(currentItemId);
 
-            // Find previous actionable incomplete item
+            // Find previous actionable item (regardless of completion status)
             for (let i = currentIndex - 1; i >= 0; i--) {
                 const id = allItems[i];
-                if (isActionable(id) && !isItemCompletedById(id)) {
+                if (isActionable(id)) {
                     setCurrentItem(id);
                     return;
                 }
@@ -1460,7 +1467,7 @@
             // Wrap around
             for (let i = allItems.length - 1; i >= currentIndex; i--) {
                 const id = allItems[i];
-                if (isActionable(id) && !isItemCompletedById(id)) {
+                if (isActionable(id)) {
                     setCurrentItem(id);
                     return;
                 }
