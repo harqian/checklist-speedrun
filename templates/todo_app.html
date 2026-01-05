@@ -302,7 +302,25 @@
             margin-top: 8px;
         }
 
-        .help-modal, .completion-modal {
+        .help-panel {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100vh;
+            background-color: var(--bg-color);
+            border-left: 1px solid var(--border-color);
+            padding: 20px;
+            transition: right 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .help-panel.active {
+            right: 0;
+        }
+
+        .completion-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -315,18 +333,47 @@
             justify-content: center;
         }
 
-        .help-modal.active, .completion-modal.active {
+        .help-panel h2 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .completion-modal.active {
             display: flex;
         }
 
         .help-content {
-            background-color: var(--bg-color);
-            padding: 30px;
-            border-radius: 12px;
-            width: auto;
-            max-width: min(90vw, 600px);
-            max-height: 80vh;
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .help-panel table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .help-panel td {
+            padding: 8px 4px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .help-panel td:first-child {
+            font-weight: 600;
+            padding-right: 10px;
+        }
+
+        .close-help {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
         }
 
         .completion-content {
@@ -401,36 +448,6 @@
         .completion-content button:hover {
             transform: scale(1.05);
             box-shadow: 0 5px 20px rgba(14, 165, 233, 0.4);
-        }
-
-        .help-content h2 {
-            margin-bottom: 20px;
-        }
-
-        .help-content table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .help-content td {
-            padding: 8px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .help-content td:first-child {
-            font-weight: 600;
-            white-space: nowrap;
-            padding-right: 20px;
-        }
-
-        .close-help {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: var(--hover-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
         }
 
         .status {
@@ -554,12 +571,11 @@
 
     <div class="todo-container" id="todoContainer"></div>
 
-    <div class="help-modal" id="helpModal">
+    <div class="help-panel" id="helpModal">
         <div class="help-content">
-            <h2>Keyboard Shortcuts</h2>
+            <h2>Shortcuts <button class="close-help" onclick="hideHelp()">×</button></h2>
             <table id="shortcutsTable">
             </table>
-            <button class="close-help" onclick="hideHelp()">Close</button>
         </div>
     </div>
 
@@ -1600,7 +1616,7 @@
         }
 
         function showHelp() {
-            document.getElementById('helpModal').classList.add('active');
+            document.getElementById('helpModal').classList.toggle('active');
         }
 
         function hideHelp() {
