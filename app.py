@@ -48,7 +48,7 @@ def get_sheets_service():
     try:
         credentials = service_account.Credentials.from_service_account_file(
             SERVICE_ACCOUNT_FILE, scopes=SCOPES)
-        service = build('sheets', 'v4', credentials=credentials)
+        service = build('sheets', 'v4', credentials=credentials, cache_discovery=False)
         return service
     except Exception as e:
         app.logger.error(f"Error creating sheets service: {e}")
@@ -163,7 +163,7 @@ def log_time():
         # Find today's date in column A
         result = service.spreadsheets().values().get(
             spreadsheetId=SPREADSHEET_ID,
-            range=f'{SHEET_NAME}!A:A'
+            range=f"'{SHEET_NAME}'!A:A"
         ).execute()
 
         values = result.get('values', [])
@@ -189,7 +189,7 @@ def log_time():
         time_str = " ".join(parts)
 
         # Update the cell
-        range_to_update = f'{SHEET_NAME}!{column_letter}{row_number}'
+        range_to_update = f"'{SHEET_NAME}'!{column_letter}{row_number}"
         body = {'values': [[time_str]]}
 
         result = service.spreadsheets().values().update(

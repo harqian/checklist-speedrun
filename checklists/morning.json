@@ -1,6 +1,5 @@
 {
   "shower": false,
-  "what is the SI prefix mnemonic? (look at it afterwards)": false,
   "do": {
     "moisturization": false,
     "powder": false,
@@ -19,12 +18,8 @@
     "cleats? gloves? umbrella?": true
   },
   "——————————— (headphones, dnd) ——————————": null,
-  "30s: appreciate one person in my life that loves me": {
-    "happy :)": false
-  },
-  "30s: appreciate an achievement i have that makes me proud": {
-    "happy :)": false
-  },
+  "30s: appreciate one person in my life that loves me": false,
+  "30s: appreciate an achievement i have that makes me proud": false,
   "read 2 & 5": true,
   "reminders & alexa notes (can postpone)": {
     "actually kind of fun to do these": null
