@@ -552,6 +552,79 @@
             from { box-shadow: inset 0 0 50px rgba(239, 68, 68, 0.1); }
             to { box-shadow: inset 0 0 100px rgba(239, 68, 68, 0.2); }
         }
+
+        .log-form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 12px;
+            background-color: var(--hover-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .log-fields {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .log-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .log-field label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            opacity: 0.7;
+        }
+
+        .log-field input {
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        .log-field input:focus {
+            outline: 2px solid var(--accent-color);
+            outline-offset: -1px;
+        }
+
+        .log-submit {
+            align-self: flex-end;
+            padding: 6px 16px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .log-submit:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .log-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .log-status {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .log-status.success { color: #10b981; }
+        .log-status.error { color: #ef4444; }
     </style>
 </head>
 <body>
@@ -1010,7 +1083,12 @@
         // Get item text from itemId
         function getItemText(itemId) {
             const path = itemId.split('::');
-            return path.length > 0 ? path[path.length - 1] : '';
+            return path.length > 0 ? cleanKey(path[path.length - 1]) : '';
+        }
+
+        function cleanKey(key) {
+            if (!key) return '';
+            return key.replace(/^\[[RL]\]\s*/, '');
         }
         
         // Build a flat ordered list of all items (depth-first traversal)
@@ -1039,7 +1117,8 @@
             return list;
         }
 
-        function containsTasks(item, isRushedMode = false) {
+        function containsTasks(key, item, isRushedMode = false) {
+            if (isRushedMode && key && key.startsWith('[R]')) return false;
             if (isRushedMode && item === false) return false;
             if (item === false) return true; // false is a task in non-rush mode
             if (item === true || (item !== null && typeof item !== 'object')) return true;
@@ -1047,16 +1126,17 @@
             if (item._checkable === true) return true;
             
             const keys = Object.keys(item).filter(k => k !== '_checkable');
-            return keys.some(key => containsTasks(item[key], isRushedMode));
+            return keys.some(k => containsTasks(k, item[k], isRushedMode));
         }
 
         // Check if an item has any content that should be visible in rushed mode
-        function shouldShowInRushedMode(item) {
+        function shouldShowInRushedMode(key, item) {
+            if (key && key.startsWith('[R]')) return false;
             if (item === false) return false;
             if (item === true || item === null || (item !== null && typeof item !== 'object')) return true;
             
             const keys = Object.keys(item).filter(k => k !== '_checkable');
-            return keys.some(key => shouldShowInRushedMode(item[key]));
+            return keys.some(k => shouldShowInRushedMode(k, item[k]));
         }
 
         // Check if an item value means it's interactable (can be completed)
@@ -1064,17 +1144,21 @@
             if (!itemId) return false;
             
             const path = itemId.split('::');
+            const key = path[path.length - 1];
             let value = checklistData;
-            for (const key of path) {
+            for (const k of path) {
                 if (!value || typeof value !== 'object') {
                     value = undefined;
                     break;
                 }
-                value = value[key];
+                value = value[k];
             }
 
             if (value === undefined || value === null) return false;
             if (isPipeWrapped(itemId)) return false;
+
+            // Log items are actionable
+            if (key.startsWith('[L]')) return true;
 
             // 'false' items are actionable notes that are hidden in rushed mode
             if (value === false) return !isRushed;
@@ -1086,7 +1170,7 @@
 
             if (hasChildren) {
                 // Parent is actionable ONLY if it contains NO sub-tasks (only notes/headers)
-                return !keys.some(key => containsTasks(value[key], isRushed));
+                return !keys.some(k => containsTasks(k, value[k], isRushed));
             }
 
             // Leaf node: headers handled above
@@ -1118,11 +1202,11 @@
             return isActionable(itemId);
         }
 
-        function isItemCompleted(item, path = []) {
+        function isItemCompleted(key, item, path = []) {
             const itemId = generateItemId(path);
 
             // In rushed mode, if an item should be filtered out, it doesn't need to be completed
-            if (isRushed && !shouldShowInRushedMode(item)) return true;
+            if (isRushed && !shouldShowInRushedMode(key, item)) return true;
 
             if (item === null || isPipeWrapped(itemId)) return true;
             if (item === false) return completedItems.has(itemId);
@@ -1138,8 +1222,8 @@
             }
 
             // Otherwise, it's a non-actionable parent: all actionable children must be done
-            for (const key of keys) {
-                if (!isItemCompleted(item[key], [...path, key])) {
+            for (const k of keys) {
+                if (!isItemCompleted(k, item[k], [...path, k])) {
                     return false;
                 }
             }
@@ -1277,13 +1361,13 @@
                 const value = data[key];
 
                 // In rushed mode, skip items that have no visible content (neither tasks nor headers/notes)
-                if (isRushed && !shouldShowInRushedMode(value)) continue;
+                if (isRushed && !shouldShowInRushedMode(key, value)) continue;
 
                 const itemPath = [...path, key];
                 const itemId = generateItemId(itemPath);
                 
                 const hasChildren = value !== null && typeof value === 'object' && Object.keys(value).length > 0;
-                const isCompleted = isItemCompleted(value, itemPath);
+                const isCompleted = isItemCompleted(key, value, itemPath);
                 const isActionableItem = isActionable(itemId);
                 const isHeader = value === null || isPipeWrapped(itemId);
                 const isDisplayOnly = value === false;
@@ -1347,14 +1431,107 @@
 
                 const textDiv = document.createElement('div');
                 textDiv.className = 'todo-text';
-                let markdownHtml = DOMPurify.sanitize(marked.parse(key));
+                const displayKey = isEditMode ? key : cleanKey(key);
+                let markdownHtml = DOMPurify.sanitize(marked.parse(displayKey));
                 if (markdownHtml.trim().startsWith('<p>') && markdownHtml.trim().endsWith('</p>')) {
                     markdownHtml = markdownHtml.trim().slice(3, -4);
                 }
                 textDiv.innerHTML = markdownHtml;
                 itemDiv.appendChild(textDiv);
 
-                if (hasChildren) {
+                // Render log form if it's a log item
+                if (key.startsWith('[L]') && value && typeof value === 'object') {
+                    const logForm = document.createElement('div');
+                    logForm.className = 'log-form';
+                    logForm.onclick = (e) => e.stopPropagation();
+
+                    const fieldsContainer = document.createElement('div');
+                    fieldsContainer.className = 'log-fields';
+
+                    const fields = value.fields || ['Value'];
+                    const inputs = {};
+
+                    fields.forEach(fieldName => {
+                        const fieldDiv = document.createElement('div');
+                        fieldDiv.className = 'log-field';
+                        
+                        const label = document.createElement('label');
+                        label.textContent = fieldName;
+                        fieldDiv.appendChild(label);
+
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.dataset.fieldName = fieldName;
+                        
+                        // Add keyboard shortcut to focus next input or submit
+                        input.addEventListener('keydown', (e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                const allInputs = Array.from(logForm.querySelectorAll('input'));
+                                const index = allInputs.indexOf(input);
+                                if (index < allInputs.length - 1) {
+                                    allInputs[index + 1].focus();
+                                } else {
+                                    submitBtn.click();
+                                }
+                            }
+                        });
+
+                        fieldDiv.appendChild(input);
+                        fieldsContainer.appendChild(fieldDiv);
+                        inputs[fieldName] = input;
+                    });
+
+                    logForm.appendChild(fieldsContainer);
+
+                    const statusMsg = document.createElement('div');
+                    statusMsg.className = 'log-status';
+                    
+                    const submitBtn = document.createElement('button');
+                    submitBtn.className = 'log-submit';
+                    submitBtn.textContent = 'Log';
+                    submitBtn.onclick = async () => {
+                        submitBtn.disabled = true;
+                        statusMsg.textContent = 'Logging...';
+                        statusMsg.className = 'log-status';
+
+                        const logData = {
+                            sheet_name: value.sheet,
+                            spreadsheet_id: value.spreadsheet_id,
+                            values: fields.map(f => inputs[f].value)
+                        };
+
+                        try {
+                            const response = await fetch('/api/append-row', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(logData)
+                            });
+                            const result = await response.json();
+                            if (result.success) {
+                                statusMsg.textContent = '✓ Logged';
+                                statusMsg.className = 'log-status success';
+                                if (!completedItems.has(itemId)) {
+                                    toggleItem(itemId, itemPath, true, false);
+                                }
+                            } else {
+                                statusMsg.textContent = 'Error: ' + result.error;
+                                statusMsg.className = 'log-status error';
+                                submitBtn.disabled = false;
+                            }
+                        } catch (err) {
+                            statusMsg.textContent = 'Error: ' + err.message;
+                            statusMsg.className = 'log-status error';
+                            submitBtn.disabled = false;
+                        }
+                    };
+
+                    logForm.appendChild(submitBtn);
+                    logForm.appendChild(statusMsg);
+                    itemDiv.appendChild(logForm);
+                }
+
+                if (hasChildren && !key.startsWith('[L]')) {
                     const childrenDiv = document.createElement('div');
                     childrenDiv.className = 'children';
                     childrenDiv.appendChild(renderItems(value, itemPath));
@@ -1367,7 +1544,12 @@
                         itemDiv.addEventListener('click', (e) => {
                             e.stopPropagation();
                             setCurrentItem(itemId);
-                            toggleItem(itemId, itemPath, true, false);
+                            if (key.startsWith('[L]')) {
+                                const firstInput = itemDiv.querySelector('input');
+                                if (firstInput) firstInput.focus();
+                            } else {
+                                toggleItem(itemId, itemPath, true, false);
+                            }
                         });
                     } else if (isNavigable(itemId)) {
                         itemDiv.style.cursor = 'pointer';
@@ -1491,7 +1673,7 @@
 
         function checkCompletion() {
             if (checklistData) {
-                if (isItemCompleted(checklistData, [])) {
+                if (isItemCompleted('', checklistData, [])) {
                     pauseTimer();
                     logTime(getTotalTime());
                 }
@@ -1593,7 +1775,7 @@
                 if (!current || typeof current !== 'object') return false;
                 current = current[key];
             }
-            return isItemCompleted(current, path);
+            return isItemCompleted(path[path.length - 1], current, path);
         }
 
         function completeCurrentAndNext() {
@@ -1607,6 +1789,17 @@
 
             if (isActionable(currentItemId)) {
                 const path = currentItemId.split('::');
+                const key = path[path.length - 1];
+                
+                if (key.startsWith('[L]') && !completedItems.has(currentItemId)) {
+                    const el = document.querySelector(`[data-item-id="${currentItemId.replace(/:/g, '\\:')}"]`);
+                    const firstInput = el ? el.querySelector('input') : null;
+                    if (firstInput && document.activeElement !== firstInput) {
+                        firstInput.focus();
+                        return;
+                    }
+                }
+
                 if (!completedItems.has(currentItemId)) {
                     toggleItem(currentItemId, path, true, true);
                 } else {

@@ -1,5 +1,5 @@
 {
-  "shower": false,
+  "[R] shower": false,
   "do": {
     "moisturization": false,
     "powder": false,
@@ -19,14 +19,17 @@
     "cleats? gloves? umbrella?": true
   },
   "——————————— (headphones, dnd) ——————————": null,
-  "30s (literally on timer): appreciate [one person in my life that loves me] || [an achievement i have that makes me proud] || [life is beautiful]": false,
+  "[R] 30s (literally on timer): appreciate [one person in my life that loves me] || [an achievement i have that makes me proud] || [life is beautiful]": true,
   "read 2 & 5": true,
   "reminders & alexa notes (can postpone)": {
     "actually kind of fun to do these": null
   },
   "alarms": {
     "look at calendar, set alarms for important things": true,
-    "if going to late events, turn off alarms saying to sleep": true
+    "if going to late events": {
+      "turn off alarms saying to sleep": true,
+      "turn of pauses from pause": true
+    }
   },
   "check whoop data: bad? fix": false
 }

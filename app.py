@@ -213,6 +213,50 @@ def log_time():
         app.logger.error(f"Unexpected error in log_time: {e}")
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/append-row', methods=['POST'])
+def append_row():
+    """Append a row of data to a Google Sheet"""
+    try:
+        data = request.json
+        sheet_name = data.get('sheet_name', SHEET_NAME)
+        values = data.get('values', [])
+        spreadsheet_id = data.get('spreadsheet_id', SPREADSHEET_ID)
+        
+        if not values:
+            return jsonify({'error': 'No values provided'}), 400
+            
+        if not spreadsheet_id:
+            return jsonify({'error': 'SPREADSHEET_ID not configured'}), 500
+
+        service = get_sheets_service()
+        if not service:
+            return jsonify({'error': 'Could not connect to Google Sheets'}), 500
+
+        # Prepend timestamp
+        now = datetime.now()
+        timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
+        row_data = [timestamp] + values
+
+        body = {'values': [row_data]}
+        
+        result = service.spreadsheets().values().append(
+            spreadsheetId=spreadsheet_id,
+            range=f"'{sheet_name}'!A1",
+            valueInputOption='USER_ENTERED',
+            insertDataOption='INSERT_ROWS',
+            body=body
+        ).execute()
+
+        return jsonify({
+            'success': True,
+            'message': f'Logged to {sheet_name}',
+            'updated_range': result.get('updates', {}).get('updatedRange')
+        })
+
+    except Exception as e:
+        app.logger.error(f"Error in append_row: {e}")
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     # Use environment variables for host/port if available, but default to 5001 as per original
     port = int(os.getenv('PORT', 5001))

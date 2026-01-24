@@ -7,8 +7,17 @@
     "nose solution": true,
     "brush": true,
     "floss": true,
-    "log: echo?": false,
     "do !habits": true,
+    "log: echo?": false,
+    "[L] log: tracker": {
+      "sheet": "tracker_new_2026.1_processing",
+      "fields": [
+        "How long ago did you eat? (h)",
+        "How full do you feel? (1-5)",
+        "Sports intensity (1-5)",
+        "Screens intensity (1-5)"
+      ]
+    },
     "put on WHOOP": true,
     "earplugs, turn off all lights, get red light": true
   },
