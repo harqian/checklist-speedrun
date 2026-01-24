@@ -5,6 +5,7 @@
     "powder": false,
     "eat gummies": true,
     "deodorant": true,
+    "sunscreen": true,
     "nose solution": true,
     "brush": true
   },
@@ -18,8 +19,7 @@
     "cleats? gloves? umbrella?": true
   },
   "——————————— (headphones, dnd) ——————————": null,
-  "30s: appreciate one person in my life that loves me": false,
-  "30s: appreciate an achievement i have that makes me proud": false,
+  "30s (literally on timer): appreciate [one person in my life that loves me] || [an achievement i have that makes me proud] || [life is beautiful]": false,
   "read 2 & 5": true,
   "reminders & alexa notes (can postpone)": {
     "actually kind of fun to do these": null
@@ -28,7 +28,5 @@
     "look at calendar, set alarms for important things": true,
     "if going to late events, turn off alarms saying to sleep": true
   },
-  "look at nomo": false,
-  "look at !habit": false,
   "check whoop data: bad? fix": false
 }

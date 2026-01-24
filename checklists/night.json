@@ -7,7 +7,7 @@
     "nose solution": true,
     "brush": true,
     "floss": true,
-    "log: phys res? echo? sleep data?": false,
+    "log: echo?": false,
     "do !habits": true,
     "put on WHOOP": true,
     "earplugs, turn off all lights, get red light": true
